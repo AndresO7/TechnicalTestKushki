@@ -123,15 +123,46 @@ export const usePetStore = create<PetStore>((set, get) => ({
   updatePet: async (pet) => {
     try {
       set({ loading: true, error: null });
-      await petApi.updatePet(pet);
       
-      // Actualizamos el estado local inmediatamente
+      // Aseguramos que el objeto pet tenga la estructura correcta
+      const petToUpdate = {
+        id: pet.id,
+        category: {
+          id: pet.category.id,
+          name: pet.category.name
+        },
+        name: pet.name,
+        photoUrls: pet.photoUrls,
+        tags: pet.tags.map(tag => ({
+          id: tag.id,
+          name: tag.name
+        })),
+        status: pet.status
+      };
+
+      const updatedPet = await petApi.updatePet(petToUpdate);
+      
+      // Actualizamos el estado local
       set(state => {
-        const updatedPets = state.pets.map(p => p.id === pet.id ? pet : p);
-        const updatedAllPets = state.allPets.map(p => p.id === pet.id ? pet : p);
+        // Actualizamos solo si la mascota existe en el estado actual
+        const petExists = state.pets.some(p => p.id === updatedPet.id);
+        
+        let newPets = petExists
+          ? state.pets.map(p => p.id === updatedPet.id ? updatedPet : p)
+          : state.pets;
+
+        let newAllPets = state.allPets.map(p => 
+          p.id === updatedPet.id ? updatedPet : p
+        );
+
+        // Si el estado ha cambiado, puede que necesitemos mover o eliminar la mascota
+        if (updatedPet.status !== state.activeTab) {
+          newPets = newPets.filter(p => p.id !== updatedPet.id);
+        }
+
         return {
-          pets: updatedPets,
-          allPets: updatedAllPets,
+          pets: newPets,
+          allPets: newAllPets,
           loading: false,
         };
       });

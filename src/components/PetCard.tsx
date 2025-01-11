@@ -128,9 +128,10 @@ export const PetCard = ({ pet, onEdit, onBuy }: PetCardProps) => {
           </div>
           
           {pet.category && (
-            <p className="text-sm text-secondary-600">
+            <div className="text-sm text-secondary-500">
+              <span className="font-medium text-secondary-700">Categoría: </span>
               {pet.category.name}
-            </p>
+            </div>
           )}
         </CardContent>
         

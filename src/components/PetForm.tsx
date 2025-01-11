@@ -13,17 +13,18 @@ interface PetFormProps {
 }
 
 const CATEGORIES = [
-  { id: 1, name: 'Perros' },
-  { id: 2, name: 'Gatos' },
-  { id: 3, name: 'Aves' },
-  { id: 4, name: 'Peces' },
-  { id: 5, name: 'Reptiles' },
-  { id: 6, name: 'Otros' },
+  { id: 1, name: 'Perro' },
+  { id: 2, name: 'Gato' },
+  { id: 3, name: 'Ave' },
+  { id: 4, name: 'Pez' },
+  { id: 5, name: 'Reptil' },
+  { id: 6, name: 'Otro' },
 ];
 
 export const PetForm = ({ pet, onSubmit, onCancel }: PetFormProps) => {
   const [formData, setFormData] = useState<Pet>({
-    category: pet?.category || { id: 1, name: 'Perros' },
+    id: pet?.id,
+    category: pet?.category || { id: 1, name: 'Perro' },
     name: pet?.name || '',
     photoUrls: pet?.photoUrls || [''],
     tags: pet?.tags || [{ id: 1, name: '' }],
