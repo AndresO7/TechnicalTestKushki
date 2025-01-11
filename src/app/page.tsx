@@ -6,7 +6,7 @@ import { PetCard } from '../components/PetCard';
 import { PetForm } from '../components/PetForm';
 import { Toast } from '../components/Toast';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowUp } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dynamic from 'next/dynamic';
 import { usePetStore } from '../store/usePetStore';
@@ -24,6 +24,7 @@ export default function Home() {
   const [showForm, setShowForm] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | undefined>();
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const {
     pets,
@@ -60,6 +61,20 @@ export default function Home() {
     }
   }, [inView, hasMore, loading]);
 
+  // Manejador para el scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleCreatePet = async (petData: Pet) => {
     await createPet(petData);
     setShowForm(false);
@@ -93,9 +108,10 @@ export default function Home() {
       ))}
       {hasMore && (
         <div ref={loadMoreRef} className="col-span-full flex justify-center py-8">
-          {loading && (
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
-          )}
+          <div className="flex flex-col items-center gap-2">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
+            <p className="text-sm text-secondary-500">Cargando más mascotas...</p>
+          </div>
         </div>
       )}
     </div>
@@ -191,6 +207,17 @@ export default function Home() {
           />
         )}
       </div>
+
+      {/* Botón para volver arriba */}
+      {showScrollTop && (
+        <Button
+          className="fixed bottom-6 right-6 rounded-full w-12 h-12 bg-primary-gradient hover:bg-primary-gradient-hover shadow-lg hover:shadow-xl transition-all duration-300 z-50"
+          onClick={scrollToTop}
+          size="icon"
+        >
+          <ArrowUp className="h-6 w-6 text-white" />
+        </Button>
+      )}
     </div>
   );
 }
