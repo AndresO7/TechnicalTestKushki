@@ -140,11 +140,66 @@ npm run dev
 
 ### Diagramas de Flujo
 
-![DiagramaFlujo](public/diagrama1.png)
+```mermaid
+sequenceDiagram
+    participant Cliente
+    participant PetStore API
+    
+    %% Flujo de Creación
+    Cliente->>PetStore API: POST /v2/pet
+    Note over Cliente,PetStore API: {name, category, photoUrls, tags, status}
+    alt Éxito
+        PetStore API-->>Cliente: 200 OK (Pet Object)
+    else Error
+        PetStore API-->>Cliente: 405 Invalid input
+    end
+    
+    %% Flujo de Actualización
+    Cliente->>PetStore API: PUT /v2/pet
+    Note over Cliente,PetStore API: {id, name, category, photoUrls, tags, status}
+    alt Éxito
+        PetStore API-->>Cliente: 200 OK (Updated Pet)
+    else Pet no encontrado
+        PetStore API-->>Cliente: 404 Pet not found
+    else Error
+        PetStore API-->>Cliente: 405 Validation exception
+    end
+    
+    %% Flujo de Compra
+    Cliente->>PetStore API: POST /v2/store/order
+    Note over Cliente,PetStore API: {id, petId, quantity, shipDate, status, complete}
+    alt Éxito
+        PetStore API-->>Cliente: 200 OK (Order Object)
+    else Error
+        PetStore API-->>Cliente: 400 Invalid Order
+    end
+```
+
 
 ### Diagrama de Interacción con la API
 
-![DiagramaFlujo](public/diagrama2.png)
+```mermaid
+graph TD
+    A[Cliente] -->|Crear Mascota| B(POST /v2/pet)
+    A -->|Buscar Mascotas| C(GET /v2/pet/findByStatus)
+    A -->|Actualizar Mascota| D(PUT /v2/pet)
+    A -->|Crear Orden| E(POST /v2/store/order)
+    
+    B --> F{Respuesta}
+    C --> F
+    D --> F
+    E --> F
+    
+    F -->|200| G[Éxito]
+    F -->|4xx| H[Error Cliente]
+    F -->|5xx| I[Error Servidor]
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style F fill:#ff9,stroke:#333,stroke-width:2px
+    style G fill:#9f9,stroke:#333,stroke-width:2px
+    style H fill:#f99,stroke:#333,stroke-width:2px
+    style I fill:#f99,stroke:#333,stroke-width:2px
+```
 
 ### Ejemplos de Código
 
